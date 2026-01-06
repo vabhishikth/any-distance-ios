@@ -31,36 +31,21 @@ workflows:
         script: |
           cd ADAC
           
-          # Generate a fresh private key for certificates
-          PRIVATE_KEY_PATH="$HOME/certificate_key.key"
-          openssl genrsa -out "$PRIVATE_KEY_PATH" 2048
+          # Simplified approach - let Codemagic handle certificate creation
+          app-store-connect fetch-signing-files "com.vabhishikth.anydistance" \
+            --type IOS_APP_STORE --create --verbose
           
-          # Create certificates with the generated private key
-          app-store-connect certificates create \
-            --type IOS_DISTRIBUTION \
-            --certificate-key "$PRIVATE_KEY_PATH" \
-            --save || echo "Distribution certificate may already exist"
+          app-store-connect fetch-signing-files "com.vabhishikth.anydistance.Widget" \
+            --type IOS_APP_STORE --create --verbose
           
-          app-store-connect certificates create \
-            --type IOS_DEVELOPMENT \
-            --certificate-key "$PRIVATE_KEY_PATH" \
-            --save || echo "Development certificate may already exist"
+          app-store-connect fetch-signing-files "com.vabhishikth.anydistance.NotificationService" \
+            --type IOS_APP_STORE --create --verbose
           
-          # Fetch profiles for all targets
-          for id in "com.vabhishikth.anydistance" \
-                    "com.vabhishikth.anydistance.Widget" \
-                    "com.vabhishikth.anydistance.NotificationService" \
-                    "com.vabhishikth.anydistance.watchkitapp" \
-                    "com.vabhishikth.anydistance.watchkitapp.watchkitextension"; do
-            app-store-connect fetch-signing-files "$id" \
-              --type IOS_APP_DEVELOPMENT \
-              --certificate-key "$PRIVATE_KEY_PATH" \
-              --create
-            app-store-connect fetch-signing-files "$id" \
-              --type IOS_APP_STORE \
-              --certificate-key "$PRIVATE_KEY_PATH" \
-              --create
-          done
+          app-store-connect fetch-signing-files "com.vabhishikth.anydistance.watchkitapp" \
+            --type IOS_APP_STORE --create --verbose
+          
+          app-store-connect fetch-signing-files "com.vabhishikth.anydistance.watchkitapp.watchkitextension" \
+            --type IOS_APP_STORE --create --verbose
           
           # Add certificates to keychain
           keychain add-certificates
