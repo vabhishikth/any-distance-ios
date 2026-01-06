@@ -8,14 +8,10 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.vabhishikth.anydistance
-        # Reference the certificates we created in the Codemagic UI
-        provisioning_profiles: []
-        certificates:
-          - name: "Any Distance Distribution"
-          - name: "Any Distance Development"
       vars:
         XCODE_WORKSPACE: "ADAC/ADAC.xcworkspace"
         XCODE_SCHEME: "ADAC"
+        CERTIFICATE_NAME: "Any Distance Distribution"
     scripts:
       - name: Initialize Keychain
         script: keychain initialize
