@@ -4,33 +4,46 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       vars:
-        # UPDATED PATH: Points to the workspace inside the ADAC folder
+        # Path to your workspace
         XCODE_WORKSPACE: "ADAC/ADAC.xcworkspace"
-        # Scheme name usually stays the same
+        # Scheme name
         XCODE_SCHEME: "ADAC"
     integrations:
       app_store_connect: "Codemagic Build Key"
     scripts:
       - name: Initialize Keychain
         script: keychain initialize
+        
+      - name: Fetch Signing Files & Create Profiles
+        script: |
+          # Go into the folder so we can find the project file
+          cd ADAC
+          
+          # 1. Ask Apple for the certificates and profiles (Create them if missing)
+          # We use "IOS_APP_STORE" so we can upload to TestFlight
+          app-store-connect fetch-signing-files "$(xcode-project detect-bundle-id)" --type IOS_APP_STORE --create
+          
+          # 2. Setup the keychain
+          keychain add-certificates
+          
+          # 3. Force Xcode to use these new profiles
+          xcode-project use-profiles
+          
       - name: Install CocoaPods
         script: |
-          # Navigate into the folder where the Podfile lives
           cd ADAC
           gem install cocoapods
           pod install
-          # Go back to root for the build command
-          cd ..
+          
       - name: Build and Sign IPA
         script: |
+          # We removed the manual signing flags because "use-profiles" set them up for us above
           xcodebuild -workspace "$XCODE_WORKSPACE" \
           -scheme "$XCODE_SCHEME" \
           -sdk iphoneos \
           -configuration Release \
-          -archivePath build/MyApp.xcarchive archive \
-          PROVISIONING_PROFILE_SPECIFIER="" \
-          CODE_SIGN_STYLE="Manual" \
-          CODE_SIGN_IDENTITY="$CM_CERTIFICATE_IDENTITY"
+          -archivePath build/MyApp.xcarchive archive
+          
       - name: Generate Artifact
         script: |
           xcodebuild -exportArchive \
