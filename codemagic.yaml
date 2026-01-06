@@ -14,12 +14,12 @@ workflows:
         
       - name: Fetch Signing Files (ALL Targets)
         script: |
-          # This command is updated to find EVERY bundle ID in your project 
-          # including the Widget, Watch app, and OneSignal
           cd ADAC
+          # Fetch signing files for ALL bundle IDs in the workspace
           app-store-connect fetch-signing-files --type IOS_APP_STORE --create
           keychain add-certificates
           xcode-project use-profiles
+          cd ..
           
       - name: Install CocoaPods (Hard Reset)
         script: |
@@ -33,23 +33,23 @@ workflows:
           
       - name: Build and Sign (iPhone + Watch Ultra)
         script: |
-          # We use -destination to clarify the platform for the Watch component
-          # and -allowProvisioningUpdates to solve the signing mismatch
-          xcodebuild -workspace "$XCODE_WORKSPACE" \
-          -scheme "$XCODE_SCHEME" \
-          -sdk iphoneos \
+          # Build from within ADAC directory so CocoaPods paths work correctly
+          # Remove -destination flag to let xcodebuild handle multi-platform targets
+          cd ADAC
+          xcodebuild -workspace "ADAC.xcworkspace" \
+          -scheme "ADAC" \
           -configuration Release \
-          -destination 'generic/platform=iOS' \
-          -archivePath build/MyApp.xcarchive \
+          -archivePath ../build/MyApp.xcarchive \
           -allowProvisioningUpdates \
           archive
+          cd ..
           
       - name: Generate Artifact
         script: |
           xcodebuild -exportArchive \
           -archivePath build/MyApp.xcarchive \
           -exportPath build/ \
-          -exportOptionsPlist export_options.plist
+          -exportOptionsPlist ADAC/export_options.plist
           
     artifacts:
       - build/*.ipa
