@@ -4327,7 +4327,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 4.100;
-				PRODUCT_BUNDLE_IDENTIFIER = com.vabhishikth.anydistance.OneSignal;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vabhishikth.anydistance.NotificationService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -4362,7 +4362,7 @@
 				);
 				MARKETING_VERSION = 4.100;
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.vabhishikth.anydistance.OneSignal;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vabhishikth.anydistance.NotificationService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;

@@ -34,7 +34,7 @@ workflows:
           # Fetch profiles for all targets with NEW bundle IDs
           for id in "com.vabhishikth.anydistance" \
                     "com.vabhishikth.anydistance.Widget" \
-                    "com.vabhishikth.anydistance.OneSignal" \
+                    "com.vabhishikth.anydistance.NotificationService" \
                     "com.vabhishikth.anydistance.watchkitapp" \
                     "com.vabhishikth.anydistance.watchkitapp.watchkitextension"; do
             app-store-connect fetch-signing-files "$id" --type IOS_APP_DEVELOPMENT --create
