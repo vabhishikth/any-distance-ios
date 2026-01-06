@@ -5,13 +5,9 @@ workflows:
     integrations:
       app_store_connect: "Codemagic Build Key"
     environment:
-      groups:
-        - app_store_credentials
       vars:
         XCODE_WORKSPACE: "ADAC/ADAC.xcworkspace"
         XCODE_SCHEME: "ADAC"
-        APP_STORE_CONNECT_ISSUER_ID: "14d92899-1527-4b51-acc5-d4e98a7445d9"
-        APP_STORE_CONNECT_KEY_IDENTIFIER: "G24PDPXM4G"
     scripts:
       - name: Initialize Keychain
         script: keychain initialize
@@ -35,38 +31,23 @@ workflows:
         script: |
           cd ADAC
           
-          # Fetch signing files with explicit credentials
+          # Fetch profiles for all targets (certificates already exist in Codemagic)
           app-store-connect fetch-signing-files "com.vabhishikth.anydistance" \
-            --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
-            --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
-            --private-key "$APP_STORE_CONNECT_PRIVATE_KEY" \
-            --type IOS_APP_STORE --create --verbose
+            --type IOS_APP_STORE --create
           
           app-store-connect fetch-signing-files "com.vabhishikth.anydistance.Widget" \
-            --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
-            --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
-            --private-key "$APP_STORE_CONNECT_PRIVATE_KEY" \
-            --type IOS_APP_STORE --create --verbose
+            --type IOS_APP_STORE --create
           
           app-store-connect fetch-signing-files "com.vabhishikth.anydistance.NotificationService" \
-            --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
-            --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
-            --private-key "$APP_STORE_CONNECT_PRIVATE_KEY" \
-            --type IOS_APP_STORE --create --verbose
+            --type IOS_APP_STORE --create
           
           app-store-connect fetch-signing-files "com.vabhishikth.anydistance.watchkitapp" \
-            --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
-            --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
-            --private-key "$APP_STORE_CONNECT_PRIVATE_KEY" \
-            --type IOS_APP_STORE --create --verbose
+            --type IOS_APP_STORE --create
           
           app-store-connect fetch-signing-files "com.vabhishikth.anydistance.watchkitapp.watchkitextension" \
-            --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
-            --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
-            --private-key "$APP_STORE_CONNECT_PRIVATE_KEY" \
-            --type IOS_APP_STORE --create --verbose
+            --type IOS_APP_STORE --create
           
-          # Add certificates to keychain
+          # Add the manually created certificates to keychain
           keychain add-certificates
           
           # Apply profiles to Xcode project
