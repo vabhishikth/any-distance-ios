@@ -31,6 +31,10 @@ workflows:
         script: |
           cd ADAC
           
+          # Create certificates first (force new creation)
+          app-store-connect certificates create --type IOS_DISTRIBUTION --save || true
+          app-store-connect certificates create --type IOS_DEVELOPMENT --save || true
+          
           # Fetch profiles for all targets with NEW bundle IDs
           for id in "com.vabhishikth.anydistance" \
                     "com.vabhishikth.anydistance.Widget" \
