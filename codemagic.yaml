@@ -48,6 +48,7 @@ workflows:
             -scheme "$XCODE_SCHEME" \
             -configuration Release \
             -archivePath ../build/ADAC.xcarchive \
+            -allowProvisioningUpdates \
             archive
           
       - name: Export IPA
