@@ -33,23 +33,20 @@ workflows:
           
       - name: Build and Sign (iPhone + Watch Ultra)
         script: |
-          # Build from within ADAC directory so CocoaPods paths work correctly
-          # Remove -destination flag to let xcodebuild handle multi-platform targets
           cd ADAC
           xcodebuild -workspace "ADAC.xcworkspace" \
           -scheme "ADAC" \
           -configuration Release \
-          -archivePath ../build/MyApp.xcarchive \
+          -archivePath "$CM_BUILD_DIR/build/MyApp.xcarchive" \
           -allowProvisioningUpdates \
           archive
-          cd ..
           
       - name: Generate Artifact
         script: |
           xcodebuild -exportArchive \
-          -archivePath build/MyApp.xcarchive \
-          -exportPath build/ \
-          -exportOptionsPlist ADAC/export_options.plist
+          -archivePath "$CM_BUILD_DIR/build/MyApp.xcarchive" \
+          -exportPath "$CM_BUILD_DIR/build/" \
+          -exportOptionsPlist "$CM_BUILD_DIR/ADAC/export_options.plist"
           
     artifacts:
       - build/*.ipa
