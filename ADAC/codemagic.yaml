@@ -1,0 +1,37 @@
+workflows:
+  ios-native-production:
+    name: Native iOS Build
+    instance_type: mac_mini_m2
+    environment:
+      vars:
+        # We use the workspace because you have CocoaPods
+        XCODE_WORKSPACE: "ADAC.xcworkspace"
+        # The scheme is usually the same as the project name
+        XCODE_SCHEME: "ADAC"
+    integrations:
+      app_store_connect: "Codemagic Build Key"
+    scripts:
+      - name: Initialize Keychain
+        script: keychain initialize
+      - name: Install CocoaPods
+        script: |
+          gem install cocoapods
+          pod install
+      - name: Build and Sign IPA
+        script: |
+          xcodebuild -workspace "$XCODE_WORKSPACE" \
+          -scheme "$XCODE_SCHEME" \
+          -sdk iphoneos \
+          -configuration Release \
+          -archivePath build/MyApp.xcarchive archive \
+          PROVISIONING_PROFILE_SPECIFIER="" \
+          CODE_SIGN_STYLE="Manual" \
+          CODE_SIGN_IDENTITY="$CM_CERTIFICATE_IDENTITY"
+      - name: Generate Artifact
+        script: |
+          xcodebuild -exportArchive \
+          -archivePath build/MyApp.xcarchive \
+          -exportPath build/ \
+          -exportOptionsPlist export_options.plist
+    artifacts:
+      - build/*.ipa
