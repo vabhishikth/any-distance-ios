@@ -5,9 +5,6 @@ workflows:
     integrations:
       app_store_connect: "Codemagic Build Key"
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.vabhishikth.anydistance
       vars:
         XCODE_WORKSPACE: "ADAC/ADAC.xcworkspace"
         XCODE_SCHEME: "ADAC"
@@ -32,17 +29,28 @@ workflows:
           
       - name: Setup Code Signing
         script: |
-          # Add certificates from Codemagic's code signing identities
+          # Add certificates from Codemagic
           keychain add-certificates
           
-          # List what certificates we have
-          echo "Available certificates:"
+          # Show what certificates we have
+          echo "=== Available Certificates ==="
           security find-identity -v -p codesigning
           
           cd ADAC
           
-          # Just apply profiles to project
-          xcode-project use-profiles --project ADAC.xcodeproj || true
+          # Create profiles for all bundle IDs (certificates already exist)
+          # Using --platform to avoid watchOS issues
+          app-store-connect fetch-signing-files "com.vabhishikth.anydistance" \
+            --type IOS_APP_STORE --create --platform IOS || echo "Main app profile issue"
+          
+          app-store-connect fetch-signing-files "com.vabhishikth.anydistance.Widget" \
+            --type IOS_APP_STORE --create --platform IOS || echo "Widget profile issue"
+          
+          app-store-connect fetch-signing-files "com.vabhishikth.anydistance.NotificationService" \
+            --type IOS_APP_STORE --create --platform IOS || echo "Notification profile issue"
+          
+          # Apply profiles to project
+          xcode-project use-profiles --project ADAC.xcodeproj
           
       - name: Build App
         script: |
