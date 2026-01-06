@@ -16,7 +16,6 @@ workflows:
           cd ADAC
           rm -rf Pods Podfile.lock
           gem install cocoapods-keys
-          # Set dummy keys (README says this is fine)
           pod keys set WahooConsumerKey_Sandbox dummy
           pod keys set WahooConsumerSecret_Sandbox dummy
           pod keys set WahooConsumerKey dummy
@@ -29,14 +28,18 @@ workflows:
           
       - name: Fetch Signing Files
         script: |
+          # Must be run from directory containing xcodeproj
           cd ADAC
+          # Fetch App Store distribution profiles for all bundle IDs
           app-store-connect fetch-signing-files "com.anydistance.anydistance" --type IOS_APP_STORE --create
           app-store-connect fetch-signing-files "com.anydistance.anydistance.Widget" --type IOS_APP_STORE --create
           app-store-connect fetch-signing-files "com.anydistance.anydistance.OneSignalNotificationServiceExtension" --type IOS_APP_STORE --create
           app-store-connect fetch-signing-files "com.anydistance.anydistance.watchkitapp" --type IOS_APP_STORE --create
           app-store-connect fetch-signing-files "com.anydistance.anydistance.watchkitapp.watchkitextension" --type IOS_APP_STORE --create
+          # Add certificates to keychain
           keychain add-certificates
-          xcode-project use-profiles
+          # Apply profiles to Xcode project - MUST run from xcodeproj directory
+          xcode-project use-profiles --project ADAC.xcodeproj
           
       - name: Build App
         script: |
@@ -45,7 +48,6 @@ workflows:
             -scheme "$XCODE_SCHEME" \
             -configuration Release \
             -archivePath ../build/ADAC.xcarchive \
-            -allowProvisioningUpdates \
             archive
           
       - name: Export IPA
