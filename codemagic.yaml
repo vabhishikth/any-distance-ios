@@ -30,7 +30,13 @@ workflows:
       - name: Fetch Signing Files
         script: |
           cd ADAC
-          # Fetch BOTH Development and App Store profiles to satisfy all targets
+          
+          # Force Manual Signing Style in the project file for ALL targets
+          # This is more reliable than passing flags to xcodebuild sometimes
+          sed -i '' 's/ProvisioningStyle = Automatic;/ProvisioningStyle = Manual;/g' ADAC.xcodeproj/project.pbxproj
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' ADAC.xcodeproj/project.pbxproj
+          
+          # Fetch BOTH Development and App Store profiles for all 5 targets
           for id in "com.anydistance.anydistance" \
                     "com.anydistance.anydistance.Widget" \
                     "com.anydistance.anydistance.OneSignalNotificationServiceExtension" \
@@ -39,17 +45,22 @@ workflows:
             app-store-connect fetch-signing-files "$id" --type IOS_APP_DEVELOPMENT --create
             app-store-connect fetch-signing-files "$id" --type IOS_APP_STORE --create
           done
+          
+          # Add certificates to keychain
           keychain add-certificates
+          
+          # Apply profiles to Xcode project
           xcode-project use-profiles --project ADAC.xcodeproj
           
       - name: Build App
         script: |
           cd ADAC
+          # Removed -allowProvisioningUpdates as it can trigger "No Account" errors
+          # Explicitly setting CODE_SIGN_STYLE to Manual
           xcodebuild -workspace "ADAC.xcworkspace" \
             -scheme "$XCODE_SCHEME" \
             -configuration Release \
             -archivePath ../build/ADAC.xcarchive \
-            -allowProvisioningUpdates \
             CODE_SIGN_STYLE="Manual" \
             archive
           
