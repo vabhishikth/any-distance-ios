@@ -2,20 +2,19 @@ workflows:
   ios-native-production:
     name: Native iOS Build
     instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: "Codemagic Build Key" # This must match your Integration name exactly
     environment:
       vars:
         XCODE_WORKSPACE: "ADAC/ADAC.xcworkspace"
         XCODE_SCHEME: "ADAC"
-      # This links the API Key you uploaded in Team Integrations
-      groups:
-        - appstore_credentials 
     scripts:
       - name: Initialize Keychain
         script: keychain initialize
         
       - name: Fetch Signing Files from Apple
         script: |
-          # This command uses your API key to download certificates
+          # Automatically downloads certificates and profiles
           app-store-connect fetch-signing-files "$(xcode-project detect-bundle-id)" --type IOS_APP_STORE --create
           keychain add-certificates
           xcode-project use-profiles
@@ -23,7 +22,6 @@ workflows:
       - name: Install CocoaPods (Clean Reset)
         script: |
           cd ADAC
-          # Fixing Status Code 1 by removing local locks and reinstalling
           rm -rf Pods
           rm -f Podfile.lock
           gem install cocoapods
@@ -33,7 +31,6 @@ workflows:
           
       - name: Build and Sign IPA
         script: |
-          # No manual flags needed here because "use-profiles" handled it
           xcodebuild -workspace "$XCODE_WORKSPACE" \
           -scheme "$XCODE_SCHEME" \
           -sdk iphoneos \
@@ -53,5 +50,4 @@ workflows:
     publishing:
       app_store_connect:
         auth: integration
-        # Automatically submits to TestFlight after a successful build
         submit_to_testflight: true
