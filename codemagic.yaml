@@ -1,9 +1,9 @@
 workflows:
   ios-native-production:
-    name: Native iOS Build
+    name: Native iOS & Watch Build
     instance_type: mac_mini_m2
     integrations:
-      app_store_connect: "Codemagic Build Key" # This must match your Integration name exactly
+      app_store_connect: "Codemagic Build Key"
     environment:
       vars:
         XCODE_WORKSPACE: "ADAC/ADAC.xcworkspace"
@@ -12,14 +12,14 @@ workflows:
       - name: Initialize Keychain
         script: keychain initialize
         
-      - name: Fetch Signing Files from Apple
+      - name: Fetch Signing Files (iPhone & Watch)
         script: |
-          # Automatically downloads certificates and profiles
+          # This command fetches profiles for all targets in your workspace
           app-store-connect fetch-signing-files "$(xcode-project detect-bundle-id)" --type IOS_APP_STORE --create
           keychain add-certificates
           xcode-project use-profiles
           
-      - name: Install CocoaPods (Clean Reset)
+      - name: Install CocoaPods
         script: |
           cd ADAC
           rm -rf Pods
@@ -29,13 +29,16 @@ workflows:
           pod install --repo-update
           cd ..
           
-      - name: Build and Sign IPA
+      - name: Build and Sign (iPhone + Watch Ultra)
         script: |
+          # Added -allowProvisioningUpdates to fix the Status Code 65 error
           xcodebuild -workspace "$XCODE_WORKSPACE" \
           -scheme "$XCODE_SCHEME" \
           -sdk iphoneos \
           -configuration Release \
-          -archivePath build/MyApp.xcarchive archive
+          -archivePath build/MyApp.xcarchive \
+          -allowProvisioningUpdates \
+          archive
           
       - name: Generate Artifact
         script: |
