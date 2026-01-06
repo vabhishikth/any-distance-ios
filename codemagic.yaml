@@ -31,18 +31,12 @@ workflows:
         script: |
           cd ADAC
           
-          # 1. Fix Team ID Mismatch (UCNNRR6B3Y -> ZT6KZUP4U2)
-          sed -i '' 's/UCNNRR6B3Y/ZT6KZUP4U2/g' ADAC.xcodeproj/project.pbxproj
-          
-          # 2. Use Production APS environment for Release build
-          sed -i '' 's/aps-environment<\/key>.*<string>development/aps-environment<\/key>\n\t<string>production/g' ADAC/ADAC.entitlements
-          
-          # 3. Fetch BOTH Development and App Store profiles for all 5 targets
-          for id in "com.anydistance.anydistance" \
-                    "com.anydistance.anydistance.Widget" \
-                    "com.anydistance.anydistance.OneSignalNotificationServiceExtension" \
-                    "com.anydistance.anydistance.watchkitapp" \
-                    "com.anydistance.anydistance.watchkitapp.watchkitextension"; do
+          # Fetch profiles for all targets with NEW bundle IDs
+          for id in "com.vabhishikth.anydistance" \
+                    "com.vabhishikth.anydistance.Widget" \
+                    "com.vabhishikth.anydistance.OneSignal" \
+                    "com.vabhishikth.anydistance.watchkitapp" \
+                    "com.vabhishikth.anydistance.watchkitapp.watchkitextension"; do
             app-store-connect fetch-signing-files "$id" --type IOS_APP_DEVELOPMENT --create
             app-store-connect fetch-signing-files "$id" --type IOS_APP_STORE --create
           done
@@ -50,19 +44,12 @@ workflows:
           # Add certificates to keychain
           keychain add-certificates
           
-          # 4. Apply profiles to Xcode project
-          # Note: We removed the manual 'sed' for ProvisioningStyle = Manual.
-          # use-profiles will handle the transition from Automatic to Manual correctly.
+          # Apply profiles to Xcode project
           xcode-project use-profiles --project ADAC.xcodeproj
-          
-          # DEBUG: Check signing state after tool runs
-          echo "--- Signing State Debug ---"
-          grep -E "ProvisioningStyle|CODE_SIGN_STYLE|DEVELOPMENT_TEAM" ADAC.xcodeproj/project.pbxproj | head -n 20
           
       - name: Build App
         script: |
           cd ADAC
-          # Explicitly setting CODE_SIGN_STYLE to Manual to ensure archive step uses profiles
           xcodebuild -workspace "ADAC.xcworkspace" \
             -scheme "$XCODE_SCHEME" \
             -configuration Release \

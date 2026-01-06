@@ -3851,7 +3851,7 @@
 				MARKETING_VERSION = 4.100;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.anydistance.anydistance.Widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vabhishikth.anydistance.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3894,7 +3894,7 @@
 				MARKETING_VERSION = 4.100;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.anydistance.anydistance.Widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vabhishikth.anydistance.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -4131,7 +4131,7 @@
 					"\"libswscale\"",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -Xfrontend -warn-long-expression-type-checking=100 -Xfrontend -warn-long-function-bodies=100";
-				PRODUCT_BUNDLE_IDENTIFIER = com.anydistance.anydistance;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vabhishikth.anydistance;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -4241,7 +4241,7 @@
 					"\"libswscale\"",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS";
-				PRODUCT_BUNDLE_IDENTIFIER = com.anydistance.anydistance;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vabhishikth.anydistance;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -4327,7 +4327,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 4.100;
-				PRODUCT_BUNDLE_IDENTIFIER = com.anydistance.anydistance.OneSignalNotificationServiceExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vabhishikth.anydistance.OneSignal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -4362,7 +4362,7 @@
 				);
 				MARKETING_VERSION = 4.100;
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.anydistance.anydistance.OneSignalNotificationServiceExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vabhishikth.anydistance.OneSignal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -4393,14 +4393,14 @@
 				IBSC_MODULE = Any_Distance_WatchKit_Extension;
 				INFOPLIST_KEY_CFBundleDisplayName = "Any Distance";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.anydistance.anydistance;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.vabhishikth.anydistance;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
 				MARKETING_VERSION = 4.408;
-				PRODUCT_BUNDLE_IDENTIFIER = com.anydistance.anydistance.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vabhishikth.anydistance.watchkitapp;
 				PRODUCT_NAME = "Any Distance";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
@@ -4430,7 +4430,7 @@
 				IBSC_MODULE = Any_Distance_WatchKit_Extension;
 				INFOPLIST_KEY_CFBundleDisplayName = "Any Distance";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.anydistance.anydistance;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.vabhishikth.anydistance;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -4438,7 +4438,7 @@
 				);
 				MARKETING_VERSION = 4.408;
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.anydistance.anydistance.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vabhishikth.anydistance.watchkitapp;
 				PRODUCT_NAME = "Any Distance";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
@@ -4478,7 +4478,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 4.408;
-				PRODUCT_BUNDLE_IDENTIFIER = com.anydistance.anydistance.watchkitapp.watchkitextension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vabhishikth.anydistance.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
@@ -4519,7 +4519,7 @@
 				);
 				MARKETING_VERSION = 4.408;
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.anydistance.anydistance.watchkitapp.watchkitextension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vabhishikth.anydistance.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
