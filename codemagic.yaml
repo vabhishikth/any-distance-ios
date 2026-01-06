@@ -6,6 +6,7 @@ workflows:
       app_store_connect: "Codemagic Build Key"
     environment:
       vars:
+        XCODE_WORKSPACE: "ADAC/ADAC.xcworkspace"
         XCODE_SCHEME: "ADAC"
     scripts:
       - name: Initialize Keychain
@@ -28,17 +29,17 @@ workflows:
           
       - name: Fetch Signing Files
         script: |
-          # Must be run from directory containing xcodeproj
           cd ADAC
-          # Fetch App Store distribution profiles for all bundle IDs
-          app-store-connect fetch-signing-files "com.anydistance.anydistance" --type IOS_APP_STORE --create
-          app-store-connect fetch-signing-files "com.anydistance.anydistance.Widget" --type IOS_APP_STORE --create
-          app-store-connect fetch-signing-files "com.anydistance.anydistance.OneSignalNotificationServiceExtension" --type IOS_APP_STORE --create
-          app-store-connect fetch-signing-files "com.anydistance.anydistance.watchkitapp" --type IOS_APP_STORE --create
-          app-store-connect fetch-signing-files "com.anydistance.anydistance.watchkitapp.watchkitextension" --type IOS_APP_STORE --create
-          # Add certificates to keychain
+          # Fetch BOTH Development and App Store profiles to satisfy all targets
+          for id in "com.anydistance.anydistance" \
+                    "com.anydistance.anydistance.Widget" \
+                    "com.anydistance.anydistance.OneSignalNotificationServiceExtension" \
+                    "com.anydistance.anydistance.watchkitapp" \
+                    "com.anydistance.anydistance.watchkitapp.watchkitextension"; do
+            app-store-connect fetch-signing-files "$id" --type IOS_APP_DEVELOPMENT --create
+            app-store-connect fetch-signing-files "$id" --type IOS_APP_STORE --create
+          done
           keychain add-certificates
-          # Apply profiles to Xcode project - MUST run from xcodeproj directory
           xcode-project use-profiles --project ADAC.xcodeproj
           
       - name: Build App
@@ -49,6 +50,7 @@ workflows:
             -configuration Release \
             -archivePath ../build/ADAC.xcarchive \
             -allowProvisioningUpdates \
+            CODE_SIGN_STYLE="Manual" \
             archive
           
       - name: Export IPA
