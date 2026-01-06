@@ -4,9 +4,9 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       vars:
-        # We use the workspace because you have CocoaPods
-        XCODE_WORKSPACE: "ADAC.xcworkspace"
-        # The scheme is usually the same as the project name
+        # UPDATED PATH: Points to the workspace inside the ADAC folder
+        XCODE_WORKSPACE: "ADAC/ADAC.xcworkspace"
+        # Scheme name usually stays the same
         XCODE_SCHEME: "ADAC"
     integrations:
       app_store_connect: "Codemagic Build Key"
@@ -15,8 +15,12 @@ workflows:
         script: keychain initialize
       - name: Install CocoaPods
         script: |
+          # Navigate into the folder where the Podfile lives
+          cd ADAC
           gem install cocoapods
           pod install
+          # Go back to root for the build command
+          cd ..
       - name: Build and Sign IPA
         script: |
           xcodebuild -workspace "$XCODE_WORKSPACE" \
