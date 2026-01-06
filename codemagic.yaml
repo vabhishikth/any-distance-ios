@@ -5,6 +5,9 @@ workflows:
     integrations:
       app_store_connect: "Codemagic Build Key"
     environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.vabhishikth.anydistance
       vars:
         XCODE_WORKSPACE: "ADAC/ADAC.xcworkspace"
         XCODE_SCHEME: "ADAC"
@@ -27,31 +30,19 @@ workflows:
           pod keys set GarminConsumerSecret dummy
           pod install --repo-update
           
-      - name: Fetch Signing Files
+      - name: Setup Code Signing
         script: |
-          cd ADAC
-          
-          # Fetch profiles for all targets (certificates already exist in Codemagic)
-          app-store-connect fetch-signing-files "com.vabhishikth.anydistance" \
-            --type IOS_APP_STORE --create
-          
-          app-store-connect fetch-signing-files "com.vabhishikth.anydistance.Widget" \
-            --type IOS_APP_STORE --create
-          
-          app-store-connect fetch-signing-files "com.vabhishikth.anydistance.NotificationService" \
-            --type IOS_APP_STORE --create
-          
-          app-store-connect fetch-signing-files "com.vabhishikth.anydistance.watchkitapp" \
-            --type IOS_APP_STORE --create
-          
-          app-store-connect fetch-signing-files "com.vabhishikth.anydistance.watchkitapp.watchkitextension" \
-            --type IOS_APP_STORE --create
-          
-          # Add the manually created certificates to keychain
+          # Add certificates from Codemagic's code signing identities
           keychain add-certificates
           
-          # Apply profiles to Xcode project
-          xcode-project use-profiles --project ADAC.xcodeproj
+          # List what certificates we have
+          echo "Available certificates:"
+          security find-identity -v -p codesigning
+          
+          cd ADAC
+          
+          # Just apply profiles to project
+          xcode-project use-profiles --project ADAC.xcodeproj || true
           
       - name: Build App
         script: |
@@ -60,7 +51,7 @@ workflows:
             -scheme "$XCODE_SCHEME" \
             -configuration Release \
             -archivePath ../build/ADAC.xcarchive \
-            CODE_SIGN_STYLE="Manual" \
+            -allowProvisioningUpdates \
             archive
           
       - name: Export IPA
