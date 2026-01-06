@@ -12,34 +12,33 @@ workflows:
       - name: Initialize Keychain
         script: keychain initialize
         
+      - name: Install CocoaPods
+        script: |
+          cd ADAC
+          rm -rf Pods Podfile.lock
+          pod install --repo-update
+          ls -la Pods/  # Verify pods installed
+          
       - name: Fetch Signing Files (ALL Targets)
         script: |
-          # Go to project folder to detect all IDs (App, Watch, Widget, etc)
           cd ADAC
-          # Fetch profiles for the main app AND all extensions automatically
-          app-store-connect fetch-signing-files "$(xcode-project detect-bundle-id)" --type IOS_APP_STORE --create
+          # Fetch for each bundle ID explicitly
+          app-store-connect fetch-signing-files "com.anydistance.anydistance" --type IOS_APP_STORE --create
+          app-store-connect fetch-signing-files "com.anydistance.anydistance.Widget" --type IOS_APP_STORE --create
+          app-store-connect fetch-signing-files "com.anydistance.anydistance.OneSignalNotificationServiceExtension" --type IOS_APP_STORE --create
+          app-store-connect fetch-signing-files "com.anydistance.anydistance.watchkitapp" --type IOS_APP_STORE --create
+          app-store-connect fetch-signing-files "com.anydistance.anydistance.watchkitapp.watchkitextension" --type IOS_APP_STORE --create
           keychain add-certificates
           xcode-project use-profiles
           
-      - name: Install CocoaPods (Hard Reset)
-        script: |
-          cd ADAC
-          rm -rf Pods
-          rm -f Podfile.lock
-          gem install cocoapods
-          pod install --repo-update
-          cd ..
-          
       - name: Build and Sign (iPhone + Watch)
         script: |
-          # FIX 1: Removed "-sdk iphoneos" so the Watch App is built correctly
-          # FIX 2: Added CODE_SIGN_STYLE="Manual" to stop the "No Accounts" error
-          xcodebuild -workspace "$XCODE_WORKSPACE" \
-          -scheme "$XCODE_SCHEME" \
+          cd ADAC
+          xcodebuild -workspace "ADAC.xcworkspace" \
+          -scheme "ADAC" \
           -configuration Release \
-          -archivePath build/MyApp.xcarchive \
+          -archivePath ../build/MyApp.xcarchive \
           -allowProvisioningUpdates \
-          CODE_SIGN_STYLE="Manual" \
           archive
           
       - name: Generate Artifact
@@ -47,7 +46,7 @@ workflows:
           xcodebuild -exportArchive \
           -archivePath build/MyApp.xcarchive \
           -exportPath build/ \
-          -exportOptionsPlist export_options.plist
+          -exportOptionsPlist ADAC/export_options.plist
           
     artifacts:
       - build/*.ipa
