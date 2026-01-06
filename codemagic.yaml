@@ -4,40 +4,36 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       vars:
-        # Path to your workspace
         XCODE_WORKSPACE: "ADAC/ADAC.xcworkspace"
-        # Scheme name
         XCODE_SCHEME: "ADAC"
-    integrations:
-      app_store_connect: "Codemagic Build Key"
+      # This links the API Key you uploaded in Team Integrations
+      groups:
+        - appstore_credentials 
     scripts:
       - name: Initialize Keychain
         script: keychain initialize
         
-      - name: Fetch Signing Files & Create Profiles
+      - name: Fetch Signing Files from Apple
         script: |
-          # Go into the folder so we can find the project file
-          cd ADAC
-          
-          # 1. Ask Apple for the certificates and profiles (Create them if missing)
-          # We use "IOS_APP_STORE" so we can upload to TestFlight
+          # This command uses your API key to download certificates
           app-store-connect fetch-signing-files "$(xcode-project detect-bundle-id)" --type IOS_APP_STORE --create
-          
-          # 2. Setup the keychain
           keychain add-certificates
-          
-          # 3. Force Xcode to use these new profiles
           xcode-project use-profiles
           
-      - name: Install CocoaPods
+      - name: Install CocoaPods (Clean Reset)
         script: |
           cd ADAC
+          # Fixing Status Code 1 by removing local locks and reinstalling
+          rm -rf Pods
+          rm -f Podfile.lock
           gem install cocoapods
-          pod install
+          pod repo update
+          pod install --repo-update
+          cd ..
           
       - name: Build and Sign IPA
         script: |
-          # We removed the manual signing flags because "use-profiles" set them up for us above
+          # No manual flags needed here because "use-profiles" handled it
           xcodebuild -workspace "$XCODE_WORKSPACE" \
           -scheme "$XCODE_SCHEME" \
           -sdk iphoneos \
@@ -50,5 +46,12 @@ workflows:
           -archivePath build/MyApp.xcarchive \
           -exportPath build/ \
           -exportOptionsPlist export_options.plist
+          
     artifacts:
       - build/*.ipa
+      
+    publishing:
+      app_store_connect:
+        auth: integration
+        # Automatically submits to TestFlight after a successful build
+        submit_to_testflight: true
