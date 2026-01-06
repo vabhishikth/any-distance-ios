@@ -1,15 +1,12 @@
 workflows:
   ios-native-production:
-    name: Any Distance Build (iPhone + Watch)
+    name: Any Distance Build
     instance_type: mac_mini_m2
     integrations:
       app_store_connect: "Codemagic Build Key"
     environment:
       vars:
-        XCODE_WORKSPACE: "ADAC.xcworkspace"
         XCODE_SCHEME: "ADAC"
-      groups:
-        - wahoo_keys  # Add your API keys here in Codemagic UI
     scripts:
       - name: Initialize Keychain
         script: keychain initialize
@@ -17,29 +14,22 @@ workflows:
       - name: Install CocoaPods
         script: |
           cd ADAC
-          # Remove old state
           rm -rf Pods Podfile.lock
-          # Install cocoapods-keys plugin
           gem install cocoapods-keys
-          # Set placeholder keys for CI build (replace with actual keys in Codemagic environment variables)
-          bundle config set --local path 'vendor/bundle' || true
-          pod keys set WahooConsumerKey_Sandbox "${WAHOO_CONSUMER_KEY_SANDBOX:-placeholder}"
-          pod keys set WahooConsumerSecret_Sandbox "${WAHOO_CONSUMER_SECRET_SANDBOX:-placeholder}"
-          pod keys set WahooConsumerKey "${WAHOO_CONSUMER_KEY:-placeholder}"
-          pod keys set WahooConsumerSecret "${WAHOO_CONSUMER_SECRET:-placeholder}"
-          pod keys set GarminConsumerKey_Sandbox "${GARMIN_CONSUMER_KEY_SANDBOX:-placeholder}"
-          pod keys set GarminConsumerSecret_Sandbox "${GARMIN_CONSUMER_SECRET_SANDBOX:-placeholder}"
-          pod keys set GarminConsumerKey "${GARMIN_CONSUMER_KEY:-placeholder}"
-          pod keys set GarminConsumerSecret "${GARMIN_CONSUMER_SECRET:-placeholder}"
-          # Install pods
+          # Set dummy keys (README says this is fine)
+          pod keys set WahooConsumerKey_Sandbox dummy
+          pod keys set WahooConsumerSecret_Sandbox dummy
+          pod keys set WahooConsumerKey dummy
+          pod keys set WahooConsumerSecret dummy
+          pod keys set GarminConsumerKey_Sandbox dummy
+          pod keys set GarminConsumerSecret_Sandbox dummy
+          pod keys set GarminConsumerKey dummy
+          pod keys set GarminConsumerSecret dummy
           pod install --repo-update
-          echo "=== Pods installed ==="
-          ls -la Pods/
           
-      - name: Fetch Signing Files (ALL Targets)
+      - name: Fetch Signing Files
         script: |
           cd ADAC
-          # Fetch for each bundle ID explicitly with App Store type
           app-store-connect fetch-signing-files "com.anydistance.anydistance" --type IOS_APP_STORE --create
           app-store-connect fetch-signing-files "com.anydistance.anydistance.Widget" --type IOS_APP_STORE --create
           app-store-connect fetch-signing-files "com.anydistance.anydistance.OneSignalNotificationServiceExtension" --type IOS_APP_STORE --create
@@ -48,22 +38,22 @@ workflows:
           keychain add-certificates
           xcode-project use-profiles
           
-      - name: Build and Sign (iPhone + Watch)
+      - name: Build App
         script: |
           cd ADAC
           xcodebuild -workspace "ADAC.xcworkspace" \
-          -scheme "ADAC" \
-          -configuration Release \
-          -archivePath ../build/MyApp.xcarchive \
-          -allowProvisioningUpdates \
-          archive
+            -scheme "$XCODE_SCHEME" \
+            -configuration Release \
+            -archivePath ../build/ADAC.xcarchive \
+            -allowProvisioningUpdates \
+            archive
           
-      - name: Generate Artifact
+      - name: Export IPA
         script: |
           xcodebuild -exportArchive \
-          -archivePath build/MyApp.xcarchive \
-          -exportPath build/ \
-          -exportOptionsPlist ADAC/export_options.plist
+            -archivePath build/ADAC.xcarchive \
+            -exportPath build/ \
+            -exportOptionsPlist ADAC/export_options.plist
           
     artifacts:
       - build/*.ipa

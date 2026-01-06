@@ -40,7 +40,7 @@ target 'ADAC' do
   pod 'SwiftRichString'
   pod 'SCNLine', '~> 1.0'
   pod 'ffmpeg-kit-ios-min', '~> 4.5'
-  pod 'OAuthSwift', :git => 'git@github.com:Any-Distance/OAuthSwift.git', :branch => 'master'
+  pod 'OAuthSwift', :git => 'https://github.com/Any-Distance/OAuthSwift.git', :branch => 'master'
   pod 'MetalPetal'
   pod 'MetalPetal/Swift'
   pod 'HCKalmanFilter'
