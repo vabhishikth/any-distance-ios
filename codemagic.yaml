@@ -31,12 +31,18 @@ workflows:
         script: |
           cd ADAC
           
-          # Force Manual Signing Style in the project file for ALL targets
-          # This is more reliable than passing flags to xcodebuild sometimes
+          # 1. Fix Team ID Mismatch (UCNNRR6B3Y -> ZT6KZUP4U2)
+          # The project file uses the wrong team ID compared to export_options.plist and profiles
+          sed -i '' 's/UCNNRR6B3Y/ZT6KZUP4U2/g' ADAC.xcodeproj/project.pbxproj
+          
+          # 2. Force Manual Signing Style in the project file for ALL targets
           sed -i '' 's/ProvisioningStyle = Automatic;/ProvisioningStyle = Manual;/g' ADAC.xcodeproj/project.pbxproj
           sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' ADAC.xcodeproj/project.pbxproj
           
-          # Fetch BOTH Development and App Store profiles for all 5 targets
+          # 3. Use Production APS environment for Release build
+          sed -i '' 's/aps-environment<\/key>.*<string>development/aps-environment<\/key>\n\t<string>production/g' ADAC/ADAC.entitlements
+          
+          # 4. Fetch BOTH Development and App Store profiles for all 5 targets
           for id in "com.anydistance.anydistance" \
                     "com.anydistance.anydistance.Widget" \
                     "com.anydistance.anydistance.OneSignalNotificationServiceExtension" \
@@ -55,8 +61,8 @@ workflows:
       - name: Build App
         script: |
           cd ADAC
-          # Removed -allowProvisioningUpdates as it can trigger "No Account" errors
           # Explicitly setting CODE_SIGN_STYLE to Manual
+          # Removed -allowProvisioningUpdates to avoid account check loop
           xcodebuild -workspace "ADAC.xcworkspace" \
             -scheme "$XCODE_SCHEME" \
             -configuration Release \
